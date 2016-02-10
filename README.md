@@ -110,4 +110,37 @@ and aexpr =
 
 ### Semantics
 
+Numbers, unary operators, let-bindings, and ids have the same semantics as
+before.  Binary operator expressions evaluate their arguments and combine them
+based on the operator.  If expressions behave similarly to if statements in C:
+first, the conditional (first part) is evaluated.  If it is not `0`, the else
+branch is evaluated.  Otherwise, the then branch is evaluated.
+
+### Examples
+
+```
+sub1(5)
+
+# as an expr
+
+EPrim1(Add1, ENum(5))
+
+# evaluates to
+
+4
+```
+
+```
+if 5 - 5: 6 else: 8
+
+# as an expr
+
+EIf(EPrim2(Minus, Num(5), Num(5)), Num(6), Num(8))
+
+# evaluates to
+
+8
+```
+
+
 
