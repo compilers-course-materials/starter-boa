@@ -177,6 +177,7 @@ guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html).
   by `jne` and other conditional jump commands.
 
   Example: `cmp [esp-4], 0`
+
   Example: `cmp eax, [esp-8]`
 
 - `IJne of string` — If the _condition code_ says that the last comparison
@@ -184,8 +185,68 @@ guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html).
   comparison was _not_ equal, immediately start executing instructions from
   the given string label (by changing the program counter).
 
+  Example: `jne this_is_a_label`
+
+- `IJe of string` — Like `IJne` but with the jump/no jump cases reversed
+
 - `IJmp of string` — Unconditionally start executing instructions from the
   given label (by changing the program counter)
+
+  Example: `jmp always_go_here`
+
+#### Combining `cmp` and Jumps for If
+
+When compiling an if expression, we need to execute exactly _one_ of the
+branches (and not accidentally evaluate both!).  A typical structure for doing
+this is to have two labels: one for the else case and one for the end of the
+if expression.  So the compiled shape may look like:
+
 ```
+  cmp eax, 0    ; check if eax is equal to 0
+  je else_branch
+  ; commands for then branch go here
+  jmp end_of_if
+else_branch:
+  ; commands for else branch go here
+end_of_if:
+```
+
+Note that if we did _not_ put `jmp end_of_if` after the commands for the then
+branch, control would continue and evaluate the else branch as well.  So we
+need to make sure we skip over the else branch by unconditionally jumping to
+`end_of_if`.
+
+#### Creating New Names on the Fly
+
+In both ANF and when creating labels, we can't simply use the same identifier
+names and label names over and over.  The assembler will get confused if we
+have nested `if` expressions, because it won't know which `end_of_if` to `jmp`
+to, for example.  So we need some way of generating new names that we know
+won't conflict.
+
+You've been provided with a function `gen_temp` (meaning “generate
+temporary”) that takes a string and appends the value of a counter to it,
+which increases on each call.  You can use `gen_temp` to create fresh names
+for labels and variables, and be guaranteed the names won't overlap as long as
+you use base strings don't have numbers at the end.
+
+For example, when compiling an `if` expression, you might call `gen_temp`
+twice, once for the `else_branch` label, and once for the `end_of_if` label.
+This would produce output more like:
+
+```
+  cmp eax, 0    ; check if eax is equal to 0
+  je else_branch1
+  ; commands for then branch go here
+  jmp end_of_if2
+else_branch1:
+  ; commands for else branch go here
+end_of_if2:
+```
+
+And if there were a _nested_ if expression, it might have labels like
+`else_branch3` and `end_of_if4`.
+
+
 
 
