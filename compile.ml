@@ -58,22 +58,26 @@ let gen_temp base =
   count := !count + 1;
   sprintf "temp_%s_%d" base !count
 
-let rec anf e (k : immexpr -> aexpr) =
+let rec anf_k (e : expr) (k : immexpr -> aexpr) : aexpr =
   match e with
     | EPrim1(op, e) ->
-      anf e (fun imm -> ACExpr(CPrim1(op, imm)))
-    | ELet([], body) ->
-      failwith "You need to do this one (empty let)"
-    | ELet((name, value)::rest, body) ->
-      failwith "You need to do this one (link let)"
+      anf_k e (fun imm -> ACExpr(CPrim1(op, imm)))
+    | ELet(binds, body) ->
+      failwith "You need to do this one (let)"
     | EPrim2(op, left, right) ->
       failwith "You need to do this one (prim2)"
     | EIf(cond, thn, els) ->
-      failwith "You need to do this one (if)"
+      let tmp = gen_temp "if" in
+      let ret = (fun imm -> ACExpr(CImmExpr(imm))) in
+      anf_k cond (fun immcond ->
+        ALet(tmp, CIf(immcond, anf_k thn ret, anf_k els ret), k(ImmId(tmp))))
     | ENumber(n) ->
       k(ImmNumber(n))
     | EId(name) ->
       failwith "You need to do this one (id)"
+
+let anf (e : expr) : aexpr =
+  anf_k e (fun imm -> ACExpr(CImmExpr(imm)))
 
 let r_to_asm (r : reg) : string =
   match r with
@@ -161,14 +165,20 @@ and acompile_expr (e : aexpr) (si : int) (env : (string * int) list) : instructi
       ] @ body
     | ACExpr(s) -> acompile_step s si env
 
+let compile_anf_to_string anfed =
+  begin
+    count := 0;
+    let prelude =
+      "section .text
+  global our_code_starts_here
+  our_code_starts_here:" in
+    let compiled = (acompile_expr anfed 1 []) in
+    let as_assembly_string = (to_asm (compiled @ [IRet])) in
+    sprintf "%s%s\n" prelude as_assembly_string
+  end
+
+
 let compile_to_string prog =
-  count := 0
-  let prelude =
-    "section .text
-global our_code_starts_here
-our_code_starts_here:" in
-  let anfed = (anf prog (fun i -> ACExpr(CImmExpr(i)))) in
-  let compiled = (acompile_expr anfed 1 []) in
-  let as_assembly_string = (to_asm (compiled @ [IRet])) in
-  sprintf "%s%s\n" prelude as_assembly_string
+  let anfed = anf prog in
+  compile_anf_to_string anfed
 

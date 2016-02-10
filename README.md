@@ -155,6 +155,7 @@ ELet([("x", ENum(10)), ("y", ENum(9))],
       EId("y")))
 ```
 
+## Implementing Boa
 
 ### New Assembly Instructions
 
@@ -247,6 +248,39 @@ end_of_if2:
 And if there were a _nested_ if expression, it might have labels like
 `else_branch3` and `end_of_if4`.
 
+### Implementing ANF
+
+Aside from conditionals, the other major thing you need to do in the
+implementation of Boa is add an implementation of ANF to convert the
+user-facing syntax to the ANF syntax the compiler uses.  A few cases—`EIf`,
+`EPrim1`, and `ENumber`—are done for you.  You should study these in detail
+and understand what's going on.
+
+We'll talk more about this in class on Feb 11, and this writeup will grow then
+as well, but you can get started now (see below).
 
 
+### Recommended TODO List
+
+Here's an order in which you could consider tackling the implementation:
+
+1. Fill in the `ImmId` case in the compiler.  This will let you run things
+   like `sub1(sub1(5))` and other nested expressions.
+2. Write some tests for the input and output of nested `EPrim1` expressions in
+   `tanf`, to understand what the ANF transformation looks like on those
+   examples.
+3. Finish the `CIf` case in the compiler, so you can run simple programs with
+   `if`.  This includes the pretty-printing for the comparison and jump
+   instructions, etc.
+4. Write some tests for the input and output of performing `anf` on `EIf`
+   expressions, again to get a feel for what the transformation looks like.
+5. Work through both the `anf` implementation and the compiler implementation
+   of `Prim2`.  Write tests as you go.
+6. Work through both the `anf` implementation and the compiler implementation
+   of `ELet`.  Write tests as you go.
+
+## Handing In
+
+A complete implementation of ANF and the compiler is due Wednesday, February
+17, at 11:59pm.
 

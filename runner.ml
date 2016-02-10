@@ -59,6 +59,43 @@ let string_of_file file_name =
   really_input inchan buf 0 (in_channel_length inchan);
   buf 
 
+let run_asm asm_string out =
+  let outfile = open_out (out ^ ".s") in
+  fprintf outfile "%s" asm_string;
+  close_out outfile;
+  let (bstdout, bstdout_name, bstderr, bstderr_name, bstdin) = make_tmpfiles "build" in
+  let (rstdout, rstdout_name, rstderr, rstderr_name, rstdin) = make_tmpfiles "build" in
+  let built_pid = Unix.create_process "make" (Array.of_list [""; out ^ ".run"]) bstdin bstdout bstderr in
+  let (_, status) = waitpid [] built_pid in
+
+  let try_running = match status with
+  | WEXITED 0 ->
+    Right(string_of_file rstdout_name)
+  | WEXITED n ->
+    Left(sprintf "Finished with error while building %s:\n%s" out (string_of_file bstderr_name))
+  | WSIGNALED n ->
+    Left(sprintf "Signalled with %d while building %s." n out)
+  | WSTOPPED n ->
+    Left(sprintf "Stopped with signal %d while building %s." n out) in
+
+  let result = match try_running with
+  | Left(_) -> try_running
+  | Right(msg) ->
+    printf "%s" msg;
+    let ran_pid = Unix.create_process ("./" ^ out ^ ".run") (Array.of_list []) rstdin rstdout rstderr in
+    let (_, status) = waitpid [] ran_pid in
+    match status with
+      | WEXITED 0 -> Right(string_of_file rstdout_name)
+      | WEXITED n -> Left(sprintf "Error %d: %s" n (string_of_file rstdout_name))
+      | WSIGNALED n ->
+        Left(sprintf "Signalled with %d while running %s." n out)
+      | WSTOPPED n ->
+        Left(sprintf "Stopped with signal %d while running %s." n out) in
+
+  List.iter close [bstdout; bstderr; bstdin; rstdout; rstderr; rstdin];
+  List.iter unlink [bstdout_name; bstderr_name; rstdout_name; rstderr_name];
+  result
+
 let run p out =
   let maybe_asm_string =
     try Right(compile_to_string p)
@@ -68,47 +105,29 @@ let run p out =
   match maybe_asm_string with
   | Left(s) -> Left(s)
   | Right(asm_string) ->
-    let outfile = open_out (out ^ ".s") in
-    fprintf outfile "%s" asm_string;
-    close_out outfile;
-    let (bstdout, bstdout_name, bstderr, bstderr_name, bstdin) = make_tmpfiles "build" in
-    let (rstdout, rstdout_name, rstderr, rstderr_name, rstdin) = make_tmpfiles "build" in
-    let built_pid = Unix.create_process "make" (Array.of_list [""; out ^ ".run"]) bstdin bstdout bstderr in
-    let (_, status) = waitpid [] built_pid in
+    run_asm asm_string out
 
-    let try_running = match status with
-    | WEXITED 0 ->
-      Right(string_of_file rstdout_name)
-    | WEXITED n ->
-      Left(sprintf "Finished with error while building %s:\n%s" out (string_of_file bstderr_name))
-    | WSIGNALED n ->
-      Left(sprintf "Signalled with %d while building %s." n out)
-    | WSTOPPED n ->
-      Left(sprintf "Stopped with signal %d while building %s." n out) in
-
-    let result = match try_running with
-    | Left(_) -> try_running
-    | Right(msg) ->
-      printf "%s" msg;
-      let ran_pid = Unix.create_process ("./" ^ out ^ ".run") (Array.of_list []) rstdin rstdout rstderr in
-      let (_, status) = waitpid [] ran_pid in
-      match status with
-        | WEXITED 0 -> Right(string_of_file rstdout_name)
-        | WEXITED n -> Left(sprintf "Error %d: %s" n (string_of_file rstdout_name))
-        | WSIGNALED n ->
-          Left(sprintf "Signalled with %d while running %s." n out)
-        | WSTOPPED n ->
-          Left(sprintf "Stopped with signal %d while running %s." n out) in
-
-    List.iter close [bstdout; bstderr; bstdin; rstdout; rstderr; rstdin];
-    List.iter unlink [bstdout_name; bstderr_name; rstdout_name; rstderr_name];
-    result
+let run_anf p out =
+  let maybe_asm_string =
+    try Right(compile_anf_to_string p)
+    with Failure s -> 
+      Left("Compile error: " ^ s)
+  in    
+  match maybe_asm_string with
+  | Left(s) -> Left(s)
+  | Right(asm_string) ->
+    run_asm asm_string out
 
 
 let test_run program_str outfile expected test_ctxt =
   let full_outfile = "output/" ^ outfile in
   let program = parse_string outfile program_str in
   let result = run program full_outfile in
+  assert_equal (Right(expected ^ "\n")) result ~printer:either_printer
+
+let test_run_anf program_anf outfile expected test_ctxt =
+  let full_outfile = "output/" ^ outfile in
+  let result = run_anf program_anf full_outfile in
   assert_equal (Right(expected ^ "\n")) result ~printer:either_printer
 
 let test_err program_str outfile errmsg test_ctxt =
