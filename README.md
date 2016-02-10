@@ -49,6 +49,7 @@ The concrete syntax of Boa is:
   | <expr> + <expr>
   | <expr> - <expr>
   | <expr> * <expr>
+  | ( <expr> )
 
 <bindings> :=
   | <identifier> = <expr>
@@ -135,12 +136,27 @@ if 5 - 5: 6 else: 8
 
 # as an expr
 
-EIf(EPrim2(Minus, Num(5), Num(5)), Num(6), Num(8))
+EIf(EPrim2(Minus, ENum(5), ENum(5)), ENum(6), ENum(8))
 
 # evaluates to
 
 8
 ```
 
+```
+let x = 10, y = 9 in
+if (x - y) * 2: x else: y
+
+# as an expr
+
+ELet([("x", ENum(10)), ("y", ENum(9))],
+  EIf(EPrim2(Times, EPrim2(Minus, EId("x"), EId("y")), ENum(2)),
+      EId("x"),
+      EId("y")))
+```
 
 
+### New Assembly Instructions
+
+As usual, full summaries of the instructions we use are at [this assembly
+guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html).
