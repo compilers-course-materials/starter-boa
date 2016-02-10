@@ -160,3 +160,32 @@ ELet([("x", ENum(10)), ("y", ENum(9))],
 
 As usual, full summaries of the instructions we use are at [this assembly
 guide](http://www.cs.virginia.edu/~evans/cs216/guides/x86.html).
+
+- `IMul of arg * arg` — Multiply the left argument by the right argument, and
+  store in the left argument (typically the left argument is `eax` for us)
+  
+  Example: `mul eax, 4`
+
+- `ILabel of string` — Create a location in the code that can be jumped to
+  with `jmp`, `jne`, and other jump commands
+
+  Example: `this_is_a_label:`
+
+- `ICmp of arg * arg` — Compares the two arguments for equality.  Set the
+  _condition code_ in the machine to track if the arguments were equal, or if
+  the left was greater than or less than the right.  This information is used
+  by `jne` and other conditional jump commands.
+
+  Example: `cmp [esp-4], 0`
+  Example: `cmp eax, [esp-8]`
+
+- `IJne of string` — If the _condition code_ says that the last comparison
+  (`cmp`) was given equal arguments, do nothing.  If it says that the last
+  comparison was _not_ equal, immediately start executing instructions from
+  the given string label (by changing the program counter).
+
+- `IJmp of string` — Unconditionally start executing instructions from the
+  given label (by changing the program counter)
+```
+
+
