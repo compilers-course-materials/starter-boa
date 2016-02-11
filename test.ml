@@ -32,7 +32,6 @@ let suite =
        (EPrim1(Sub1, ENumber(55)))
        (ALet("temp_unary_1", CPrim1(Sub1, ImmNumber(55)),
           ACExpr(CImmExpr(ImmId("temp_unary_1")))));
-          
 
   ta "forty_one_run_anf" forty_one_a "41";
  
@@ -40,9 +39,11 @@ let suite =
 
 
 
-(* I would start by making these tests work 
+(* Some useful if tests to start you off
+
   t "if1" "if 5: 4 else: 2" "4";
-  t "if1" "if 0: 4 else: 2" "2";
+  t "if2" "if 0: 4 else: 2" "2";
+
   *)
   ]
 ;;
