@@ -2,6 +2,7 @@ open Compile
 open Runner
 open Printf
 open OUnit2
+open Pretty
 
 let is_osx = Conf.make_bool "osx" false "Set this flag to run on osx";;
 
@@ -12,11 +13,11 @@ let ta name program expected = name>::test_run_anf program name expected;;
 let te name program expected_err = name>::test_err program name expected_err;;
 
 let tanf name program expected = name>::fun _ ->
-  assert_equal (anf program) expected;;
+  assert_equal (anf program) expected ~printer:string_of_aexpr;;
 
-let forty_one = "sub1(42)";;
+let forty_one = "41";;
 
-let forty_one_a = ACExpr(CPrim1(Sub1, ImmNumber(42)));;
+let forty_one_a = ACExpr(CImmExpr(ImmNumber(41)));;
 
 
 let suite =
@@ -24,8 +25,14 @@ let suite =
  [
 
   tanf "forty_one_anf"
-       (EPrim1(Sub1, ENumber(42)))
+       (ENumber(41))
        forty_one_a;
+
+  tanf "prim1_anf"
+       (EPrim1(Sub1, ENumber(55)))
+       (ALet("temp_unary_1", CPrim1(Sub1, ImmNumber(55)),
+          ACExpr(CImmExpr(ImmId("temp_unary_1")))));
+          
 
   ta "forty_one_run_anf" forty_one_a "41";
  

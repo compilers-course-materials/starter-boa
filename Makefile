@@ -14,7 +14,7 @@ main: main.ml compile.ml runner.ml parser.mly lexer.mll
 	$(BUILD) -package $(PKGS) main.native
 	mv main.native main
 
-test: compile.ml runner.ml test.ml parser.mly lexer.mll
+test: compile.ml runner.ml test.ml parser.mly lexer.mll pretty.ml
 	$(BUILD) -package $(PKGS) test.native
 	mv test.native test
 

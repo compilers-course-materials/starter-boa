@@ -61,7 +61,8 @@ let gen_temp base =
 let rec anf_k (e : expr) (k : immexpr -> aexpr) : aexpr =
   match e with
     | EPrim1(op, e) ->
-      anf_k e (fun imm -> ACExpr(CPrim1(op, imm)))
+      let tmp = gen_temp "unary" in
+      anf_k e (fun imm -> ALet(tmp, CPrim1(op, imm), k (ImmId(tmp))))
     | ELet(binds, body) ->
       failwith "You need to do this one (let)"
     | EPrim2(op, left, right) ->
