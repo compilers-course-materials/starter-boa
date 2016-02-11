@@ -4,7 +4,7 @@ open Printf
 let rec intersperse (elts : 'a list) (sep : 'a) : 'a list =
   match elts with
     | [] -> []
-    | [elt] -> [sep; elt]
+    | [elt] -> [elt]
     | elt::rest -> elt::sep::(intersperse rest sep)
 
 let string_of_op1 op =

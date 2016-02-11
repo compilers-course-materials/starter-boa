@@ -124,7 +124,7 @@ sub1(5)
 
 # as an expr
 
-EPrim1(Add1, ENum(5))
+EPrim1(Sub1, ENum(5))
 
 # evaluates to
 
