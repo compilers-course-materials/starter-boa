@@ -271,17 +271,17 @@ this assignment.
 
 ### Testing Functions
 
-As before, @tt{t} and @tt{te} test the compiler end-to-end, checking for
+As before, `t` and `te` test the compiler end-to-end, checking for
 answers and errors, respectively.
 
 There are two new testing functions you can use as well:
 
-- @tt{ta} – This takes an @tt{aexpr} and an expected answer as a string, and
-  compiles and runs the @tt{aexpr} using your compiler.  This is useful if you
+- `ta` – This takes an `aexpr` and an expected answer as a string, and
+  compiles and runs the `aexpr` using your compiler.  This is useful if you
   want to, for instance, test binary operators in your compiler before you are
   confident that the ANF transformation works.
-- @tt{tanf} – This takes a @tt{expr} and a @tt{aexpr} and calls @tt{anf} the
-  @tt{expr} with @tt{fun ie -> ACExpr(CImmExpr(ie))}, and checks that the
+- `tanf` – This takes a `expr` and a `expr` and calls `anf` the
+  `expr` with `{fun ie -> ACExpr(CImmExpr(ie))`, and checks that the
   result is equal to the provided @tt{aexpr}.  You can use this to test your
   ANF directly, to make sure it's producing the constrained expression you
   expect, before you try compiling it.
