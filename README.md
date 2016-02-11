@@ -261,6 +261,14 @@ page](https://www.cs.swarthmore.edu/~jpolitz/cs75/s16/n_anf-tutorial.html)
 that describes how to think of implementing ANF in some detail, and gives
 examples of the pieces of the implementation.
 
+### A Note on Scope
+
+For this assignment, you can assume that all variables have different names.
+That means in particular you don't need to worry about nested instances of
+variables with the same name, duplicates within a list, etc.  The combination
+of these with `anf` causes some complications that go beyond our goals for
+this assignment.
+
 ### Testing Functions
 
 As before, @tt{t} and @tt{te} test the compiler end-to-end, checking for
