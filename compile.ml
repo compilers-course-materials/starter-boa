@@ -70,9 +70,9 @@ let rec anf_k (e : expr) (k : immexpr -> aexpr) : aexpr =
       let tmp = gen_temp "if" in
       let ret = (fun imm -> ACExpr(CImmExpr(imm))) in
       anf_k cond (fun immcond ->
-        ALet(tmp, CIf(immcond, anf_k thn ret, anf_k els ret), k(ImmId(tmp))))
+        ALet(tmp, CIf(immcond, anf_k thn ret, anf_k els ret), (k (ImmId(tmp)))))
     | ENumber(n) ->
-      k(ImmNumber(n))
+      (k (ImmNumber(n)))
     | EId(name) ->
       failwith "You need to do this one (id)"
 

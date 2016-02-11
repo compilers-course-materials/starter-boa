@@ -256,9 +256,10 @@ user-facing syntax to the ANF syntax the compiler uses.  A few cases—`EIf`,
 `EPrim1`, and `ENumber`—are done for you.  You should study these in detail
 and understand what's going on.
 
-We'll talk more about this in class on Feb 11, and this writeup will grow then
-as well, but you can get started now (see below).
-
+There is a detailed write up on the [course
+page](https://www.cs.swarthmore.edu/~jpolitz/cs75/s16/n_anf-tutorial.html)
+that describes how to think of implementing ANF in some detail, and gives
+examples of the pieces of the implementation.
 
 ### Recommended TODO List
 
