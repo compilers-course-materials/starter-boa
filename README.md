@@ -114,7 +114,7 @@ and aexpr =
 Numbers, unary operators, let-bindings, and ids have the same semantics as
 before.  Binary operator expressions evaluate their arguments and combine them
 based on the operator.  If expressions behave similarly to if statements in C:
-first, the conditional (first part) is evaluated.  If it is not `0`, the else
+first, the conditional (first part) is evaluated.  If it is `0`, the else
 branch is evaluated.  Otherwise, the then branch is evaluated.
 
 ### Examples
