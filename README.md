@@ -7,6 +7,20 @@ In this assignment you'll implement a small language called Boa, which has
 conversion to make binary operator compilation easy, and compile if via `jmp`
 instructions.
 
+## Errata
+
+- The counter for generated variable names is not reset before each call to
+  `anf`, which can make testing with `tanf` a little odd, since variables keep
+  incrementing.  If you want to have the counter reset before each call to
+  `anf`, you can change the body of the `anf` function to be:
+
+  ```
+  begin
+    count := 0;
+    anf_k e (fun imm -> ACExpr(CImmExpr(imm)))
+  end
+  ```
+
 ## The Boa Language
 
 As usual, there are a few pieces that go into defining a language for us to
