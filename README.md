@@ -280,7 +280,7 @@ There are two new testing functions you can use as well:
   compiles and runs the `aexpr` using your compiler.  This is useful if you
   want to, for instance, test binary operators in your compiler before you are
   confident that the ANF transformation works.
-- `tanf` – This takes a `expr` and a `expr` and calls `anf` the
+- `tanf` – This takes a `expr` and an `aexpr` and calls `anf` on the
   `expr` with `{fun ie -> ACExpr(CImmExpr(ie))`, and checks that the
   result is equal to the provided @tt{aexpr}.  You can use this to test your
   ANF directly, to make sure it's producing the constrained expression you
