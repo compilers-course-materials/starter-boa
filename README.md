@@ -34,6 +34,10 @@ instructions.
   assert_equal expected (anf program) ~printer:string_of_aexpr;;
   ```
 
+- An early version of this assignment described `if` as taking the then branch
+  when the conditional was equal to 0.  It should take the _else_ branch when
+  the conditional is equal to 0, just like in C.
+
 
 
 ## The Boa Language
