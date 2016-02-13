@@ -20,6 +20,21 @@ instructions.
     anf_k e (fun imm -> ACExpr(CImmExpr(imm)))
   end
   ```
+- The arguments to `assert_equal` in `tanf` are backwards relative to how
+  OUnit reports the expected and actual values.  To get more useful error
+  reports, change the body of `tanf` from 
+
+  ```
+  assert_equal (anf program) expected ~printer:string_of_aexpr;;
+  ```
+
+  to
+
+  ```
+  assert_equal expected (anf program) ~printer:string_of_aexpr;;
+  ```
+
+
 
 ## The Boa Language
 
